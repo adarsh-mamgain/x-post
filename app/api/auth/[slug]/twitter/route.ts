@@ -20,7 +20,11 @@ export const GET = async (req: NextRequest) => {
       }
     );
 
-    await createSession("codeVerifier", result.codeVerifier);
+    await createSession(
+      "codeVerifier",
+      result.codeVerifier,
+      Date.now() + 60 * 1000
+    );
     return NextResponse.json(result);
   } else if (
     req.method === "GET" &&
