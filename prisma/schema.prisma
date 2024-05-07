@@ -28,9 +28,10 @@ model User {
 model Session {
   id           String   @id @default(cuid())
   userId       String
-  expires      DateTime
-  sessionToken String   @unique
-  accessToken  String
+  accessToken  String   @unique
+  refreshToken String
+  expiresIn    Int
+  scope        Json
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   User         User     @relation(fields: [userId], references: [id])
@@ -44,11 +45,4 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   User        User     @relation(fields: [userId], references: [id])
-}
-
-model Oauth {
-  state        String   @id
-  codeVerifier String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 }
