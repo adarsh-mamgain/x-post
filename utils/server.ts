@@ -17,7 +17,7 @@ export async function decrypt(data: string): Promise<any> {
 export async function createSession(
   sessionName: string,
   text: string,
-  expiresAt: EpochTimeStamp
+  expiresAt: Date
 ): Promise<any> {
   // const session = await encrypt({ text, expiresAt });
   const session = cookies().set(`${sessionName}`, text, {
@@ -31,7 +31,7 @@ export async function createSession(
 }
 
 export async function getSession(sessionName: string): Promise<any> {
-  const session = cookies().get(sessionName);
+  const session = cookies().get(sessionName)?.value;
   return session;
   // if (!session) { // return null; // } // return decrypt(session); }
 }

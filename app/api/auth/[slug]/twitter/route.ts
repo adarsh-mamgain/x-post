@@ -21,9 +21,9 @@ export const GET = async (req: NextRequest) => {
     );
 
     await createSession(
-      "codeVerifier",
+      result.state,
       result.codeVerifier,
-      Date.now() + 60 * 1000
+      new Date(Date.now() + 60 * 1000)
     );
     return NextResponse.json(result);
   } else if (
@@ -41,7 +41,7 @@ export const GET = async (req: NextRequest) => {
       );
     }
 
-    const codeVerifier = await getSession("codeVerifier");
+    const codeVerifier = await getSession(state);
     const loggedClient = await client.loginWithOAuth2({
       redirectUri: "http://localhost:3000/api/auth/callback/twitter",
       codeVerifier,
@@ -49,6 +49,21 @@ export const GET = async (req: NextRequest) => {
     });
 
     // console.log("Logged client:", code, state, loggedClient);
+    // client.v2.me().then((response) => {
+    //   console.log("Me response:", response);
+    // });
+    // prisma?.session.upsert({
+    //   where: { id: "twitter" },
+    //   update: {
+    //     token: loggedClient.accessToken,
+    //     tokenSecret: loggedClient.accessTokenSecret,
+    //   },
+    //   create: {
+    //     id: "twitter",
+    //     token: loggedClient.accessToken,
+    //     tokenSecret: loggedClient.accessTokenSecret,
+    //   },
+    // });
 
     return NextResponse.redirect(process.env.URL || "");
   } else {
