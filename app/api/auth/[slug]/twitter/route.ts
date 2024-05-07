@@ -8,7 +8,7 @@ export const GET = async (req: NextRequest) => {
     req.nextUrl.pathname === "/api/auth/signin/twitter"
   ) {
     const result = client.generateOAuth2AuthLink(
-      "http://localhost:3000/api/auth/callback/twitter",
+      `${process.env.URL}/api/auth/callback/twitter`,
       {
         scope: [
           "tweet.read",
@@ -43,7 +43,7 @@ export const GET = async (req: NextRequest) => {
 
     const codeVerifier = await getSession(state);
     const loggedClient = await client.loginWithOAuth2({
-      redirectUri: "http://localhost:3000/api/auth/callback/twitter",
+      redirectUri: `${process.env.URL}/api/auth/callback/twitter`,
       codeVerifier,
       code,
     });
