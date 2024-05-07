@@ -1,3 +1,4 @@
+"use client";
 import {
   CardTitle,
   CardDescription,
@@ -13,13 +14,13 @@ import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 
 export default function ScheduleCard() {
-  prisma.post.create({
-    data: {
-      userId: "1",
-      text: "Hello, World!",
-      scheduledAt: new Date(),
-    },
-  });
+  // prisma.post.create({
+  //   data: {
+  //     userId: "1",
+  //     text: "Hello, World!",
+  //     scheduledAt: new Date(),
+  //   },
+  // });
   function handleSubmit() {
     return true;
   }
