@@ -53,23 +53,31 @@ export const GET = async (req: NextRequest) => {
     // client = null;
 
     // Create a partial client for auth links
-    const loginUser = new TwitterApi(loggedClient.accessToken);
+    var loginUser: TwitterApi | null = new TwitterApi(loggedClient.accessToken);
     loginUser.v2.me().then(async (res) => {
       const value = res.data;
-      console.log(value.id, value.name, value.username);
-      await prisma.user.upsert({
+      const some = await prisma.user.upsert({
         where: { id: value.id },
         update: {
           name: value.name,
           username: value.username,
+          accessToken: loggedClient.accessToken,
+          refreshToken: loggedClient.refreshToken,
+          expiresIn: loggedClient.expiresIn,
+          scope: loggedClient.scope,
         },
         create: {
           id: value.id,
           name: value.name,
           username: value.username,
+          accessToken: loggedClient.accessToken,
+          refreshToken: loggedClient.refreshToken ?? "",
+          expiresIn: loggedClient.expiresIn,
+          scope: loggedClient.scope,
         },
       });
     });
+    loginUser = null;
 
     return NextResponse.redirect(process.env.URL || "");
   } else {
