@@ -14,11 +14,11 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
+  id        String    @id
+  email     String?
   name      String
-  xId       String
-  xImage    String
+  username  String
+  image     String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Session   Session[]
