@@ -1,6 +1,8 @@
 import { client } from "@/lib/twitter";
 import { createSession, getSession } from "@/utils/server";
 import { NextRequest, NextResponse } from "next/server";
+import { TwitterApi } from "twitter-api-v2";
+import prisma from "@/lib/prisma";
 
 export const GET = async (req: NextRequest) => {
   if (
@@ -48,22 +50,26 @@ export const GET = async (req: NextRequest) => {
       code,
     });
 
-    // console.log("Logged client:", code, state, loggedClient);
-    // client.v2.me().then((response) => {
-    //   console.log("Me response:", response);
-    // });
-    // prisma?.session.upsert({
-    //   where: { id: "twitter" },
-    //   update: {
-    //     token: loggedClient.accessToken,
-    //     tokenSecret: loggedClient.accessTokenSecret,
-    //   },
-    //   create: {
-    //     id: "twitter",
-    //     token: loggedClient.accessToken,
-    //     tokenSecret: loggedClient.accessTokenSecret,
-    //   },
-    // });
+    // client = null;
+
+    // Create a partial client for auth links
+    const loginUser = new TwitterApi(loggedClient.accessToken);
+    loginUser.v2.me().then(async (res) => {
+      const value = res.data;
+      console.log(value.id, value.name, value.username);
+      await prisma.user.upsert({
+        where: { id: value.id },
+        update: {
+          name: value.name,
+          username: value.username,
+        },
+        create: {
+          id: value.id,
+          name: value.name,
+          username: value.username,
+        },
+      });
+    });
 
     return NextResponse.redirect(process.env.URL || "");
   } else {
