@@ -1,17 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import Link from "next/link";
-import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [authUrl, setAuthUrl] = useState("");
-
-  useEffect(() => {
+  const handleClick = () => {
     axios.get("/api/auth/signin/twitter").then((response) => {
-      setAuthUrl(response.data.url);
+      window.location.href = response.data.url;
     });
-  }, []);
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <div>
@@ -21,9 +18,7 @@ export default function Home() {
         </p>
       </div>
 
-      <Button asChild>
-        <Link href={authUrl}>Sign in</Link>
-      </Button>
+      <Button onClick={handleClick}>Sign in </Button>
     </main>
   );
 }

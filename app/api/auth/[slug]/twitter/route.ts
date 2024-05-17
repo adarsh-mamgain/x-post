@@ -2,6 +2,7 @@ import { createSession, getSession, signJWTToken } from "@/utils/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import TwitterApi from "twitter-api-v2";
+import { v4 as uuidv4 } from "uuid";
 
 // Create a partial client for auth links
 const client = new TwitterApi({
@@ -59,6 +60,7 @@ export const GET = async (req: NextRequest) => {
 
     // Create a partial client for auth links
     var loginUser = new TwitterApi(loggedClient.accessToken);
+    const newSessionId = uuidv4();
     await loginUser.v2.me().then(async (res) => {
       const value = res.data;
       const user = await prisma.user.upsert({
@@ -70,6 +72,7 @@ export const GET = async (req: NextRequest) => {
           refreshToken: loggedClient.refreshToken,
           expiresIn: loggedClient.expiresIn,
           scope: loggedClient.scope,
+          sessionId: newSessionId,
         },
         create: {
           id: value.id,
@@ -79,6 +82,7 @@ export const GET = async (req: NextRequest) => {
           refreshToken: loggedClient.refreshToken ?? "",
           expiresIn: loggedClient.expiresIn,
           scope: loggedClient.scope,
+          sessionId: newSessionId,
         },
       });
 
@@ -93,7 +97,8 @@ export const GET = async (req: NextRequest) => {
       );
     });
 
-    return NextResponse.redirect(process.env.URL || "");
+    const redirectUrl = new URL("/dashboard", process.env.URL);
+    return NextResponse.redirect(redirectUrl);
   } else {
     return NextResponse.json({ message: "No action performed" });
   }

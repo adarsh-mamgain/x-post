@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
   const session = await getSession("jwt");
-  const validatedSession = validateUserSession(session);
+  const validatedSession = await validateUserSession(session);
 
   if (!(session && validatedSession)) return redirect("/");
 

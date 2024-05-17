@@ -23,7 +23,7 @@ model User {
   refreshToken String
   expiresIn    Int
   scope        Json
-  sessionId    String?  @default(cuid())
+  sessionId    String?  @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   posts        Post[]
