@@ -1,8 +1,13 @@
-import { client } from "@/lib/twitter";
-import { createSession, getSession } from "@/utils/server";
+import { createSession, getSession, signJWTToken } from "@/utils/server";
 import { NextRequest, NextResponse } from "next/server";
-import { TwitterApi } from "twitter-api-v2";
 import prisma from "@/lib/prisma";
+import TwitterApi from "twitter-api-v2";
+
+// Create a partial client for auth links
+const client = new TwitterApi({
+  clientId: process.env.TWITTER_CLIENT_ID ?? "",
+  clientSecret: process.env.TWITTER_CLIENT_SECRET ?? "",
+});
 
 export const GET = async (req: NextRequest) => {
   if (
@@ -53,10 +58,10 @@ export const GET = async (req: NextRequest) => {
     // client = null;
 
     // Create a partial client for auth links
-    var loginUser: TwitterApi | null = new TwitterApi(loggedClient.accessToken);
-    loginUser.v2.me().then(async (res) => {
+    var loginUser = new TwitterApi(loggedClient.accessToken);
+    await loginUser.v2.me().then(async (res) => {
       const value = res.data;
-      const some = await prisma.user.upsert({
+      const user = await prisma.user.upsert({
         where: { id: value.id },
         update: {
           name: value.name,
@@ -76,8 +81,17 @@ export const GET = async (req: NextRequest) => {
           scope: loggedClient.scope,
         },
       });
+
+      const token = await signJWTToken({
+        id: user.id,
+        sessionId: user.sessionId,
+      });
+      await createSession(
+        "jwt",
+        token,
+        new Date(Date.now() + 2 * 60 * 60 * 1000)
+      );
     });
-    loginUser = null;
 
     return NextResponse.redirect(process.env.URL || "");
   } else {

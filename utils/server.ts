@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 /**
  ** Encrypt and decrypt session data
@@ -30,13 +31,34 @@ export async function createSession(
   return session;
 }
 
-export async function getSession(sessionName: string): Promise<any> {
-  const session = cookies().get(sessionName)?.value;
-  return session;
+export async function getSession(sessionName: string): Promise<string> {
+  try {
+    const session = cookies().get(sessionName)?.value as string;
+    return session;
+  } catch (error) {
+    throw new Error(error as string);
+  }
   // if (!session) { // return null; // } // return decrypt(session); }
 }
 
-export async function deleteSession(): Promise<boolean> {
-  cookies().delete("session");
+export async function deleteSession(sessionName: string): Promise<boolean> {
+  cookies().delete(sessionName);
   return true;
+}
+
+/**
+ ** Sign and Verify JWT Token
+ */
+export async function signJWTToken(
+  payload: any,
+  expiresIn?: EpochTimeStamp
+): Promise<string> {
+  const secret = process.env.JWT_SECRET ?? "";
+  const token = jwt.sign(payload, secret, { expiresIn: expiresIn ?? "2h" });
+  return JSON.stringify(token);
+}
+export async function verifyJWTToken(token: string): Promise<any> {
+  const secret = process.env.JWT_SECRET ?? "";
+  const data = JSON.parse(token);
+  return jwt.verify(data, secret);
 }
