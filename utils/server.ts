@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import prisma from "@/lib/prisma";
 
 /**
  ** Encrypt and decrypt session data
@@ -20,7 +21,6 @@ export async function createSession(
   text: string,
   expiresAt: Date
 ): Promise<any> {
-  // const session = await encrypt({ text, expiresAt });
   const session = cookies().set(`${sessionName}`, text, {
     httpOnly: true,
     secure: true,
@@ -30,7 +30,6 @@ export async function createSession(
   });
   return session;
 }
-
 export async function getSession(sessionName: string): Promise<string> {
   try {
     const session = cookies().get(sessionName)?.value as string;
@@ -38,9 +37,7 @@ export async function getSession(sessionName: string): Promise<string> {
   } catch (error) {
     throw new Error(error as string);
   }
-  // if (!session) { // return null; // } // return decrypt(session); }
 }
-
 export async function deleteSession(sessionName: string): Promise<boolean> {
   cookies().delete(sessionName);
   return true;
@@ -61,4 +58,17 @@ export async function verifyJWTToken(token: string): Promise<any> {
   const secret = process.env.JWT_SECRET ?? "";
   const data = JSON.parse(token);
   return jwt.verify(data, secret);
+}
+
+export async function validateUserSession(session: string): Promise<boolean> {
+  const validateSession = await verifyJWTToken(session);
+
+  const sessionUser = await prisma.user.findUnique({
+    where: { id: validateSession.id },
+  });
+
+  if (!(sessionUser?.sessionId === validateSession.sessionId)) {
+    return false;
+  }
+  return true;
 }
