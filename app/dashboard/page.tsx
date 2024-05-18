@@ -1,25 +1,21 @@
+"use client";
 import ScheduleCard from "@/components/ScheduleCard";
-import { getSession, validateUserSession } from "@/utils/server";
+import axios from "axios";
+import { redirect } from "next/navigation";
 
-export async function getServerSideProps() {
-  const session = await getSession("jwt");
-  const validatedSession = await validateUserSession(session);
-
-  if (!(session && validatedSession)) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {}, // will be passed to the page component as props
-  };
-}
+import { useEffect, useState } from "react";
 
 export default function Dashboard() {
+  const [authorised, setAuthorised] = useState(false);
+  useEffect(() => {
+    axios.get("/api/user/validate").then((res) => {
+      console.log("useEffect", res);
+      setAuthorised(res.data);
+    });
+  }, []);
+
+  if (!authorised) return redirect("/");
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <ScheduleCard />
