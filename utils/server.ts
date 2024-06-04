@@ -59,16 +59,3 @@ export async function verifyJWTToken(token: string): Promise<any> {
   const data = JSON.parse(token);
   return jwt.verify(data, secret);
 }
-
-export async function validateUserSession(session: string): Promise<boolean> {
-  const validateSession = await verifyJWTToken(session);
-
-  const sessionUser = await prisma.user.findUnique({
-    where: { id: validateSession.id },
-  });
-
-  if (!(sessionUser?.sessionId === validateSession.sessionId)) {
-    return false;
-  }
-  return true;
-}
