@@ -48,7 +48,7 @@ export default function Privacy() {
       <h2>Contact Us</h2>
       <p>
         If you have any questions or concerns about our Privacy Policy, please
-        contact us at{" "}
+        contact us at
         <a href="mailto:work.mamgain@gmail.com">work.mamgain@gmail.com</a>
       </p>
     </main>
