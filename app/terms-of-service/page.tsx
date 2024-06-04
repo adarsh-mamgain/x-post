@@ -15,7 +15,7 @@ export default function Privacy() {
       <h2>2. User Responsibilities</h2>
       <p>
         You are responsible for the content of the tweets scheduled through our
-        platform. You must ensure that the tweets comply with Twitter's terms of
+        platform. You must ensure that the tweets comply with Twitter&apos;s terms of
         service and any applicable laws or regulations.
       </p>
       <h2>3. Data Privacy</h2>
@@ -38,7 +38,7 @@ export default function Privacy() {
       </p>
       <h2>6. Disclaimer</h2>
       <p>
-        Our SaaS platform is provided "as is" without any warranties, express or
+        Our SaaS platform is provided &quot;as is&quot; without any warranties, express or
         implied. We do not guarantee the accuracy, reliability, or suitability
         of the platform for any purpose.
       </p>
