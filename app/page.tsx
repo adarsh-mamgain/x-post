@@ -15,7 +15,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center px-60">
+    <main className="flex min-h-screen flex-col px-60">
       {/* <nav className="flex items-center p-4">
         <div>
           <span className="text-2xl font-bold">X-Post</span>
