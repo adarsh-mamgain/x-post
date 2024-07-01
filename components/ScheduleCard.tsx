@@ -1,27 +1,21 @@
 "use client";
 
 import { z } from "zod";
-
 import {
   CardTitle,
   CardDescription,
   CardHeader,
   CardContent,
-  CardFooter,
   Card,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import prisma from "@/lib/prisma";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -37,23 +31,25 @@ import { Calendar } from "./ui/calendar";
 
 const formSchema = z.object({
   tweet: z.string().min(1).max(50),
-  datetime: z.date(),
-  image: z.string().url(),
+  date: z.date(),
+  time: z.string(),
+  image: z.string().optional(),
 });
 
 export default function ScheduleCard() {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       tweet: "",
-      datetime: undefined,
+      date: undefined,
+      time: "00:00",
       image: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    toast.error("Event has been created.");
+    console.log(values);
+    toast.error(`Event ${values} been created.`);
   }
 
   return (
@@ -88,10 +84,10 @@ export default function ScheduleCard() {
             />
             <FormField
               control={form.control}
-              name="datetime"
+              name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Datetime</FormLabel>
+                  <FormLabel>Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -103,9 +99,9 @@ export default function ScheduleCard() {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "Pp")
+                            format(field.value, "P")
                           ) : (
-                            <span>Pick a date and time</span>
+                            <span>Pick a date</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -116,11 +112,24 @@ export default function ScheduleCard() {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) => date <= new Date()} //! Important to disable past dates
+                        disabled={(date) => date < new Date()} //! Important to disable past dates
                         initialFocus
                       />
                     </PopoverContent>
                   </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time</FormLabel>
+                  <FormControl>
+                    <Input type="time" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
