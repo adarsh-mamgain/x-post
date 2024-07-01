@@ -1,6 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from "jose";
 import prisma from "@/lib/prisma";
 
 /**
@@ -42,20 +42,32 @@ export async function deleteSession(sessionName: string): Promise<boolean> {
   cookies().delete(sessionName);
   return true;
 }
+export async function validateUserSession(sessionToken: string) {
+  const validateSession = await verifyJWTToken(sessionToken);
+  const sessionUser = await prisma.user.findUnique({
+    where: { id: validateSession.id },
+  });
+
+  return sessionUser?.sessionId === validateSession.sessionId;
+}
 
 /**
  ** Sign and Verify JWT Token
  */
 export async function signJWTToken(
   payload: any,
-  expiresIn?: EpochTimeStamp
+  expiresIn: string = "2h"
 ): Promise<string> {
-  const secret = process.env.JWT_SECRET ?? "";
-  const token = jwt.sign(payload, secret, { expiresIn: expiresIn ?? "2h" });
-  return JSON.stringify(token);
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const token = await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime(expiresIn)
+    .sign(secret);
+
+  return token;
 }
 export async function verifyJWTToken(token: string): Promise<any> {
-  const secret = process.env.JWT_SECRET ?? "";
-  const data = JSON.parse(token);
-  return jwt.verify(data, secret);
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const { payload } = await jwtVerify(token, secret);
+  return payload;
 }
