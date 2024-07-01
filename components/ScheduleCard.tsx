@@ -23,16 +23,11 @@ import {
 } from "./ui/form";
 import { toast } from "sonner";
 import { Toaster } from "./ui/sonner";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "./ui/calendar";
+import { DateTimePicker } from "./ui/datetime";
 
 const formSchema = z.object({
   tweet: z.string().min(1).max(50),
-  date: z.date(),
-  time: z.string(),
+  datetime: z.date(),
   image: z.string().optional(),
 });
 
@@ -41,8 +36,7 @@ export default function ScheduleCard() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       tweet: "",
-      date: undefined,
-      time: "00:00",
+      datetime: undefined,
       image: "",
     },
   });
@@ -84,51 +78,16 @@ export default function ScheduleCard() {
             />
             <FormField
               control={form.control}
-              name="date"
+              name="datetime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "P")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date < new Date()} //! Important to disable past dates
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time</FormLabel>
+                  <FormLabel>Datetime</FormLabel>
                   <FormControl>
-                    <Input type="time" {...field} />
+                    <DateTimePicker
+                      granularity="minute"
+                      jsDate={field.value}
+                      onJsDateChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
