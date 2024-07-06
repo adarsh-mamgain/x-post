@@ -5,11 +5,13 @@ import image from "../public/image.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { BASE_URL } from "@/utils/server";
+import { APIPathname } from "@/enums";
 // import { Switch } from "@/components/ui/switch";
 
 export default function Home() {
   const handleClick = () => {
-    axios.get("/api/auth/signin/twitter").then((response) => {
+    axios.get(BASE_URL + APIPathname.TWITTER_SIGNIN).then((response) => {
       window.location.href = response.data.url;
     });
   };

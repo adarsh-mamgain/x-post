@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import prisma from "@/lib/prisma";
 
+export const BASE_URL = process.env.URL;
+
 /**
  ** Encrypt and decrypt session data
  */

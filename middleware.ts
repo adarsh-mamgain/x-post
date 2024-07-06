@@ -1,20 +1,17 @@
 import "server-only";
-import { getSession } from "@/utils/server";
+import { BASE_URL, getSession } from "@/utils/server";
 import { NextRequest, NextResponse } from "next/server";
 import { APIPathname } from "./enums";
 
 async function validateUserSession(sessionToken: string) {
   try {
-    const response = await fetch(
-      "http://localhost:3000/api/auth/user/validate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      }
-    );
+    const response = await fetch(BASE_URL + APIPathname.USER_VALIDATE, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`API call failed with status: ${response.status}`);

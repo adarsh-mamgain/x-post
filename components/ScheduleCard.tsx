@@ -24,6 +24,9 @@ import {
 import { toast } from "sonner";
 import { Toaster } from "./ui/sonner";
 import { DateTimePicker } from "./ui/datetime";
+import axios from "axios";
+import { BASE_URL } from "@/utils/server";
+import { APIPathname } from "@/enums";
 
 const formSchema = z.object({
   tweet: z.string().min(1).max(50),
@@ -42,12 +45,14 @@ export default function ScheduleCard() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast.error(`Event ${values} been created.`);
+    axios.post(BASE_URL + APIPathname.SCHEDULE, values).then((response) => {
+      console.log(response);
+      toast.error(`Event ${values} been created.`);
+    });
   }
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-5/12 h-min">
       <CardHeader>
         <CardTitle>Twitter Post Scheduler</CardTitle>
         <CardDescription>Schedule your tweets in advance.</CardDescription>
@@ -68,7 +73,8 @@ export default function ScheduleCard() {
                     <Textarea
                       id="message"
                       placeholder="Write your tweet"
-                      rows={5}
+                      maxLength={280}
+                      rows={7}
                       {...field}
                     />
                   </FormControl>
